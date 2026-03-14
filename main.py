@@ -2,6 +2,7 @@ import sys
 import yaml
 from games.sokoban import SokobanGame
 from search_engines.bfs import BFS
+from search_engines.dfs import DFS
 
 def load_config(config_file="config.yaml"):
     try:
@@ -34,7 +35,8 @@ def run(force_no_visualize=False):
     print(f"Buscando solución con algoritmo: {algorithm.upper()}...")
     
     algorithms = {
-        "bfs": BFS()
+        "bfs": BFS(),
+        "dfs": DFS()
         # Agregar otros algoritmos como "dfs": DFS(), "a_star": AStar(), etc.
     }
     
