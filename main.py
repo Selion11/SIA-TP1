@@ -3,6 +3,7 @@ import yaml
 from games.sokoban import SokobanGame
 from search_engines.bfs import BFS
 from search_engines.dfs import DFS
+from search_engines.greedy import Greedy
 
 def load_config(config_file="config.yaml"):
     try:
@@ -38,8 +39,9 @@ def run(force_no_visualize=False):
     
     algorithms = {
         "bfs": BFS(),
-        "dfs": DFS()
-        # Agregar otros algoritmos como "dfs": DFS(), "a_star": AStar(), etc.
+        "dfs": DFS(),
+        "greedy": Greedy()
+        # Faltaria A*
     }
     
     algo_instance = algorithms.get(algorithm.lower())

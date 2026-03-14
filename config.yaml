@@ -1,5 +1,5 @@
 board: "maps/level_2.txt"
-algorithm: "dfs"
+algorithm: "greedy"
 visualize: true
 save_video: true
 output_filename: "sokoban_map1.gif"
