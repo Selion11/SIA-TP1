@@ -30,15 +30,15 @@ class DFS(SearchAlgorithm):
 
             if nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
-                return None, nodes_expanded
+                return None, nodes_expanded, len(frontier)
 
             if game.is_goal(state):
                 print(f"--- ¡Solución encontrada! ---")
-                return path, nodes_expanded
+                return path, nodes_expanded, len(frontier)
 
             for next_state, action in game.get_successors(state):
                 if next_state not in visited:
                     frontier.append((next_state, path + [action]))
         
-        return None, nodes_expanded
+        return None, nodes_expanded, len(frontier)
     

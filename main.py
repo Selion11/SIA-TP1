@@ -52,36 +52,35 @@ def run(force_no_visualize=False):
         print(f"El algoritmo '{algorithm}' no está soportado aún.")
         sys.exit(1)
         
-    solution, nodes = algo_instance.search(game)
-    
-    if solution is not None:
-        print(f"¡Éxito! Pasos: {len(solution)}")
-        print(f"Camino: {' -> '.join(solution)}")
-        print(f"Nodos expandidos: {nodes}")
+    # --- BLOQUE FINAL CORREGIDO ---
+    if visualize and not force_no_visualize:
+        # MODO GRÁFICO: Le pasamos el algoritmo al visualizador y él hace la búsqueda 1 sola vez
+        try:
+            from visualizer import run_visualization
+            print("Abriendo ventana gráfica para buscar y visualizar...")
+            run_visualization(game, algorithm=algo_instance)
+        except ImportError as e:
+            print("No se pudo iniciar la visualización. Probablemente falta instalar 'pygame'.")
+            print(f"Error: {e}")
+    else:
+        # MODO CONSOLA: Hace la búsqueda y muestra TODA la información
+        import time
+        start_time = time.time()
         
-        # Separamos la lógica: si hay interfaz visual, delegamos la búsqueda al visualizador
-        if visualize and not force_no_visualize:
-            try:
-                from visualizer import run_visualization
-                print("Abriendo ventana gráfica para buscar y visualizar...")
-                run_visualization(game, algorithm=algo_instance)
-            except ImportError as e:
-                print("No se pudo iniciar la visualización. Probablemente falta instalar 'pygame'.")
-                print(f"Error: {e}")
+        # Atajamos los TRES valores que ahora devuelven tus algoritmos
+        solution, nodes, frontier_nodes = algo_instance.search(game)
+        
+        elapsed = time.time() - start_time
+        
+        if solution is not None:
+            print(f"¡Éxito! Resuelto en {elapsed:.3f} segundos.")
+            print(f"Pasos: {len(solution)}")
+            print(f"Camino: {' -> '.join(solution)}")
+            print(f"Nodos expandidos: {nodes}")
+            print(f"Nodos frontera (sin expandir): {frontier_nodes}") # <-- ACÁ ESTÁ EL DATO
         else:
-            # Modo Consola puro / Batch (Ej: Docker)
-            import time
-            start_time = time.time()
-            solution, nodes = algo_instance.search(game)
-            elapsed = time.time() - start_time
+            print(f"No se encontró solución luego de {elapsed:.3f} segundos y {nodes} nodos.")
+            print(f"Nodos frontera remanentes: {frontier_nodes}")
             
-            if solution is not None:
-                print(f"¡Éxito! Resuelto en {elapsed:.3f} segundos.")
-                print(f"Pasos: {len(solution)}")
-                print(f"Camino: {' -> '.join(solution)}")
-                print(f"Nodos expandidos: {nodes}")
-            else:
-                print(f"No se encontró solución luego de {elapsed:.3f} segundos y {nodes} nodos.")
-
 if __name__ == "__main__":
     run()

@@ -18,11 +18,10 @@ PLAYER_COLOR = (50, 150, 250)
 BOX_COLOR = (140, 90, 40)
 GOAL_COLOR = (50, 200, 50)
 BOX_ON_GOAL_COLOR = (100, 200, 100)
-TEXT_COLOR = (255, 255, 255) # Nuevo color para el texto
+TEXT_COLOR = (255, 255, 255)
 
 TILE_SIZE = 50
 
-# Ahora la función puede recibir el 'algorithm' directamente para buscar en tiempo real
 def run_visualization(game, algorithm=None, precomputed_path=None, save_video=False, output_filename="solucion.gif"):
     if 'pygame' not in sys.modules:
         print("La librería 'pygame' no está instalada. Ejecutá 'pip install pygame'")
@@ -33,7 +32,7 @@ def run_visualization(game, algorithm=None, precomputed_path=None, save_video=Fa
         save_video = False
 
     pygame.init()
-    pygame.font.init() # Inicializamos las fuentes
+    pygame.font.init()
     font = pygame.font.SysFont("Arial", 22, bold=True)
     
     entities = game.walls | game.goals | game.initial_boxes | {game.player_start}
@@ -92,21 +91,34 @@ def run_visualization(game, algorithm=None, precomputed_path=None, save_video=Fa
 
     # --- 1. MOSTRAR ESTADO INICIAL ("Searching...") ---
     draw_state(player, boxes, "Searching... Please wait.")
-    pygame.event.pump() # Evita que Windows/Mac digan que la ventana "No responde"
+    pygame.event.pump()
     
     path = precomputed_path
     
     # --- 2. EJECUTAR EL ALGORITMO Y MEDIR TIEMPO ---
     if algorithm is not None and path is None:
         start_time = time.time()
-        path, nodes = algorithm.search(game)
+        
+        path, nodes, frontier_nodes = algorithm.search(game)
+        
         elapsed_time = time.time() - start_time
         
         if path is not None:
-            success_msg = f"Solution found in {elapsed_time:.3f}s! ({nodes} nodes)"
+            print(f"\n¡Resumen de Búsqueda (Modo Visual)! ----------------")
+            print(f"Resuelto en {elapsed_time:.3f} segundos.")
+            print(f"Pasos: {len(path)}")
+            print(f"Camino: {' -> '.join(path)}")
+            print(f"Nodos expandidos totales: {nodes}")
+            print(f"Nodos frontera (sin expandir): {frontier_nodes}")
+            print(f"--------------------------------------------------\n")
+            
+            success_msg = f"Found in {elapsed_time:.3f}s! ({nodes} exp, {frontier_nodes} front)"
             draw_state(player, boxes, success_msg)
         else:
-            fail_msg = f"No solution found. Time: {elapsed_time:.3f}s"
+            print(f"\nNo se encontró solución luego de {elapsed_time:.3f} segundos y {nodes} nodos.")
+            print(f"Nodos frontera remanentes: {frontier_nodes}\n")
+            
+            fail_msg = f"Failed. Time: {elapsed_time:.3f}s. Frontier: {frontier_nodes}"
             draw_state(player, boxes, fail_msg)
             time.sleep(3)
             pygame.quit()

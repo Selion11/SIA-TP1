@@ -10,7 +10,7 @@ class SearchAlgorithm(ABC):
             game: Instancia del juego (ej: SokobanGame).
             
         Returns:
-            Una tupla (solucion_camino, nodos_expandidos)
-            o (None, nodos_expandidos) si no se halló solución.
+            Una tupla (solucion_camino, nodos_expandidos, nodos_frontera)
+            o (None, nodos_expandidos, nodos_frontera) si no se halló solución.
         """
         pass

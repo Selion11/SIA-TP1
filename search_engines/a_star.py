@@ -68,11 +68,11 @@ class AStar(SearchAlgorithm):
 
             if nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
-                return None, nodes_expanded
+                return None, nodes_expanded, len(frontier)
 
             if game.is_goal(state):
                 print(f"--- ¡Solución encontrada! ---")
-                return path, nodes_expanded
+                return path, nodes_expanded, len(frontier)
 
             for next_state, action in game.get_successors(state):
                 new_g_cost = g_cost + 1 
@@ -86,4 +86,4 @@ class AStar(SearchAlgorithm):
                     tie_breaker += 1
                     heapq.heappush(frontier, (new_f_cost, tie_breaker, new_g_cost, next_state, path + [action]))
         
-        return None, nodes_expanded
+        return None, nodes_expanded, len(frontier)

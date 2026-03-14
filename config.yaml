@@ -1,5 +1,5 @@
 board: "maps/level_3.txt"
-algorithm: "dfs"
+algorithm: "a*"
 heuristic: "manhattan"
 visualize: true
 save_video: false
