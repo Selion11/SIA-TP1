@@ -1,0 +1,3 @@
+board: "maps/level_3.txt"
+algorithm: "bfs"
+visualize: true
