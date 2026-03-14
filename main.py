@@ -3,6 +3,7 @@ import yaml
 from games.sokoban import SokobanGame
 from search_engines.bfs import BFS
 from search_engines.dfs import DFS
+from search_engines.a_star import AStar
 from search_engines.greedy import Greedy
 
 def load_config(config_file="config.yaml"):
@@ -31,6 +32,7 @@ def run(force_no_visualize=False):
     visualize = config.get("visualize", False)
     save_video = config.get("save_video",True)
     output_filename = config.get("output_filename","sokoban_output.gif")
+    heuristic = config.get("heuristic", "manhattan")
     
     map_data = load_map(map_path)
     game = SokobanGame(map_data)
@@ -40,8 +42,8 @@ def run(force_no_visualize=False):
     algorithms = {
         "bfs": BFS(),
         "dfs": DFS(),
-        "greedy": Greedy()
-        # Faltaria A*
+        "a*": AStar(heuristic_name=heuristic),
+        "greedy": Greedy(heuristic_name=heuristic)
     }
     
     algo_instance = algorithms.get(algorithm.lower())
