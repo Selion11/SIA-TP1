@@ -28,6 +28,8 @@ def run(force_no_visualize=False):
     map_path = config.get("board", "maps/level_1.txt")
     algorithm = config.get("algorithm", "bfs")
     visualize = config.get("visualize", False)
+    save_video = config.get("save_video",True)
+    output_filename = config.get("output_filename","sokoban_output.gif")
     
     map_data = load_map(map_path)
     game = SokobanGame(map_data)
@@ -57,7 +59,7 @@ def run(force_no_visualize=False):
             try:
                 from visualizer import run_visualization
                 print("Iniciando visualización...")
-                run_visualization(game, solution)
+                run_visualization(game, solution,save_video, output_filename)
             except ImportError as e:
                 print("No se pudo iniciar la visualización. Probablemente falta instalar 'pygame'.")
                 print(f"Error: {e}")
