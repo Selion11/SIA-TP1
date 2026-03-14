@@ -1,20 +1,26 @@
 # Sokoban Solver
 
-Este proyecto es una implementación de un solucionador para el juego Sokoban. Actualmente incluye motores de búsqueda BFS, DFS y Greedy.
+Este proyecto es una implementación de un solucionador para el juego Sokoban. Actualmente incluye motores de búsqueda BFS, DFS,A* y Greedy.
 
 ## Configuración
 
 El comportamiento del programa puede ser modificado utilizando el archivo `config.yaml`:
 
 ```yaml
-board: "maps/level_1.txt"
-algorithm: "bfs"
+board: "maps/level_3.txt"
+algorithm: "dfs"
+heuristic: "manhattan"
 visualize: true
+save_video: false
+output_filename: "sokoban_map3.gif"
 ```
 
 - **board**: Ruta al archivo del nivel que se desea resolver. Los niveles disponibles están en el directorio `maps/`.
-- **algorithm**: Algoritmo de búsqueda a utilizar (actualmente soportados: `bfs`, `dfs`, `greedy`).
-- **visualize**: Booleano (`true`/`false`). Si es `true` el programa intentará abrir una ventana en 2D que animará la solución encontrada en tiempo real.
+- **algorithm**: Algoritmo de búsqueda a utilizar (actualmente soportados: `bfs`, `dfs`, `greedy`o `a*`).
+- **visualize**: Booleano (`true`/`false`). Si es `true` el programa abrirá una ventana en 2D mostrando el estado de la búsqueda en tiempo real ("Searching...") y luego animará la solución encontrada.
+- **heuristic**: Función heurística a utilizar (solo requerida si el algoritmo es `greedy` o `a*`). Opciones disponibles:
+  - `manhattan`: Calcula la distancia Manhattan pura desde cada caja hasta su objetivo más cercano.
+  - `manhattan_player`: Combina la distancia Manhattan de las cajas con la distancia del jugador a la caja más cercana.
 
 > **💡 PUNTO DE ENTRADA DUAL:** El proyecto cuenta con dos puntos de entrada. `main.py` intenta ejecutar la visualización si se encuentra habilitada, lo cual es ideal para ejecuciones **LOCALES**. En cambio, `main_docker.py` fuerza la desactivación de la visualización (ignorando el archivo de configuración) para evitar crasheos en entornos sin interfaz gráfica nativa como **DOCKER** (es llamado automáticamente por el archivo `Dockerfile`).
 
