@@ -59,21 +59,29 @@ def run(force_no_visualize=False):
         print(f"Camino: {' -> '.join(solution)}")
         print(f"Nodos expandidos: {nodes}")
         
+        # Separamos la lógica: si hay interfaz visual, delegamos la búsqueda al visualizador
         if visualize and not force_no_visualize:
             try:
                 from visualizer import run_visualization
-                print("Iniciando visualización...")
-                run_visualization(game, solution,save_video, output_filename)
+                print("Abriendo ventana gráfica para buscar y visualizar...")
+                run_visualization(game, algorithm=algo_instance)
             except ImportError as e:
                 print("No se pudo iniciar la visualización. Probablemente falta instalar 'pygame'.")
                 print(f"Error: {e}")
-            except Exception as e:
-                print(f"Error al iniciar la visualización: {e}")
-        elif visualize and force_no_visualize:
-            print("Visualización desactivada por el entorno de ejecución (ej. Docker).")
-    else:
-        print("No se encontró solución.")
-        print(f"Nodos expandidos: {nodes}")
+        else:
+            # Modo Consola puro / Batch (Ej: Docker)
+            import time
+            start_time = time.time()
+            solution, nodes = algo_instance.search(game)
+            elapsed = time.time() - start_time
+            
+            if solution is not None:
+                print(f"¡Éxito! Resuelto en {elapsed:.3f} segundos.")
+                print(f"Pasos: {len(solution)}")
+                print(f"Camino: {' -> '.join(solution)}")
+                print(f"Nodos expandidos: {nodes}")
+            else:
+                print(f"No se encontró solución luego de {elapsed:.3f} segundos y {nodes} nodos.")
 
 if __name__ == "__main__":
     run()
