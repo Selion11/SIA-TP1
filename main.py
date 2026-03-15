@@ -63,11 +63,9 @@ def run(force_no_visualize=False):
             print("No se pudo iniciar la visualización. Probablemente falta instalar 'pygame'.")
             print(f"Error: {e}")
     else:
-        # MODO CONSOLA: Hace la búsqueda y muestra TODA la información
         import time
         start_time = time.time()
         
-        # Atajamos los TRES valores que ahora devuelven tus algoritmos
         solution, nodes, frontier_nodes = algo_instance.search(game)
         
         elapsed = time.time() - start_time
@@ -77,7 +75,7 @@ def run(force_no_visualize=False):
             print(f"Pasos: {len(solution)}")
             print(f"Camino: {' -> '.join(solution)}")
             print(f"Nodos expandidos: {nodes}")
-            print(f"Nodos frontera (sin expandir): {frontier_nodes}") # <-- ACÁ ESTÁ EL DATO
+            print(f"Nodos frontera (sin expandir): {frontier_nodes}")
         else:
             print(f"No se encontró solución luego de {elapsed:.3f} segundos y {nodes} nodos.")
             print(f"Nodos frontera remanentes: {frontier_nodes}")
