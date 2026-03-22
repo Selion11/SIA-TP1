@@ -20,8 +20,7 @@ def load_map(filename):
         return [list(line.rstrip('\n')) for line in f.readlines()]
 
 def run_benchmarks():
-    # maps = ["level_4.txt", "level_5.txt", "level_6.txt", "level_7.txt"]
-    maps = ["level_3.txt"]
+    maps = ["level_4.txt", "level_5.txt", "level_6.txt", "level_7.txt"]
     
     # Definimos todas las combinaciones que pediste
     runs = [

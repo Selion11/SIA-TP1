@@ -1,19 +1,7 @@
 Map,Algorithm,Heuristic,Time (s),Expanded Nodes,Frontier Nodes,Steps,Full_Name
-level_3,BFS,Ninguna,0.007184743881225586,2825,528,18,BFS
-level_3,DFS,Ninguna,0.012777566909790039,4088,224,364,DFS
-level_3,A*,manhattan,0.013631343841552734,1262,379,18,A* (manhattan)
-level_3,A*,manhattan_player,0.016458988189697266,950,413,18,A* (manhattan_player)
-level_3,Greedy,manhattan,0.006833076477050781,420,54,22,Greedy (manhattan)
-level_3,Greedy,manhattan_player,0.023076295852661133,1186,581,28,Greedy (manhattan_player)
-level_2,BFS,Ninguna,0.0016176700592041016,97,19,11,BFS
-level_2,DFS,Ninguna,0.0012753009796142578,128,21,45,DFS
-level_2,A*,manhattan,0.0011501312255859375,81,15,11,A* (manhattan)
-level_2,A*,manhattan_player,0.0006036758422851562,60,21,11,A* (manhattan_player)
-level_2,Greedy,manhattan,0.0015604496002197266,22,8,11,Greedy (manhattan)
-level_2,Greedy,manhattan_player,0.0007128715515136719,41,23,11,Greedy (manhattan_player)
-level_1,BFS,Ninguna,0.000438690185546875,4,1,3,BFS
-level_1,DFS,Ninguna,0.0001773834228515625,3,2,3,DFS
-level_1,A*,manhattan,0.00035262107849121094,4,2,3,A* (manhattan)
-level_1,A*,manhattan_player,0.0009105205535888672,4,2,3,A* (manhattan_player)
-level_1,Greedy,manhattan,0.0002579689025878906,3,2,3,Greedy (manhattan)
-level_1,Greedy,manhattan_player,0.0004971027374267578,3,2,3,Greedy (manhattan_player)
+level_3,BFS,Ninguna,0.028860092163085938,2825,528,18,BFS
+level_3,DFS,Ninguna,0.10164499282836914,4088,224,364,DFS
+level_3,A*,manhattan,0.016781330108642578,1262,379,18,A* (manhattan)
+level_3,A*,manhattan_player,0.012874364852905273,950,413,18,A* (manhattan_player)
+level_3,Greedy,manhattan,0.004241943359375,420,54,22,Greedy (manhattan)
+level_3,Greedy,manhattan_player,0.04459571838378906,1186,581,28,Greedy (manhattan_player)
