@@ -1,9 +1,9 @@
 import os
+# --- MAGIA MODO FANTASMA ---
+os.environ["SDL_VIDEODRIVER"] = "dummy" 
+
 import time
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 from games.sokoban import SokobanGame
 from search_engines.bfs import BFS
@@ -12,41 +12,81 @@ from search_engines.a_star import AStar
 from search_engines.greedy import Greedy
 from visualizer import run_visualization
 
-# Configuramos el estilo de los gráficos
-sns.set_theme(style="whitegrid")
-
 def load_map(filename):
     with open(filename, 'r') as f:
         return [list(line.rstrip('\n')) for line in f.readlines()]
 
 def run_benchmarks():
-    maps = ["level_4.txt", "level_5.txt", "level_6.txt", "level_7.txt"]
+    MAX_NODES = 12000000  # Límite de 12 Millones de nodos
+    CSV_PATH = "resultados/metricas_completas.csv"
     
-    # Definimos todas las combinaciones que pediste
-    runs = [
-        {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
-        {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
-        {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
-        {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
-        {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
-        {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
-    ]
+    # --- NUEVA ESTRUCTURA DE RUNS ---
+    # Diccionario: { "mapa.txt": [ lista_de_algoritmos_a_correr ] }
+    # Esto te permite comentar/descomentar mapas o algoritmos fácilmente.
+    runs_plan = {
+        "level_3.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
+        "level_4.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
+        "level_5.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
+        "level_6.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
+        "level_7.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ]
+    }
 
-    results = []
-    
-    # Crear carpeta para guardar todo si no existe
-    os.makedirs("resultados", exist_ok=True)
     os.makedirs("resultados/gifs", exist_ok=True)
-    os.makedirs("resultados/graficos", exist_ok=True)
+    os.makedirs("resultados", exist_ok=True)
+
+    # Si el archivo CSV ya existe, cargamos los datos previos para no pisarlos.
+    # Si no existe, creamos una lista vacía.
+    if os.path.exists(CSV_PATH):
+        print(f"--- [INFO] Archivo {CSV_PATH} encontrado. Se agregarán los nuevos resultados. ---")
+        existing_df = pd.read_csv(CSV_PATH)
+        results = existing_df.to_dict('records')
+    else:
+        print(f"--- [INFO] Creando nuevo archivo {CSV_PATH}. ---")
+        results = []
 
     print("==================================================")
-    print(" INICIANDO BENCHMARK AUTOMATIZADO ")
+    print(f" INICIANDO BENCHMARK (Límite: {MAX_NODES} nodos) ")
     print("==================================================")
 
-    for map_file in maps:
+    for map_file, runs in runs_plan.items():
         map_path = os.path.join("maps", map_file)
-        if not os.path.exists(map_path):
-            print(f"[Aviso] No se encontró {map_file}. Saltando...")
+        if not os.path.exists(map_path): 
+            print(f"--- [AVISO] El mapa {map_file} no existe en la carpeta 'maps/'. Saltando... ---")
             continue
             
         map_name = map_file.split(".")[0]
@@ -55,158 +95,60 @@ def run_benchmarks():
             algo_name = run["algo_name"]
             heuristic = run["heuristic"]
             algo_instance = run["algo_obj"]
-            
             safe_algo_name = algo_name.replace("*", "star").lower()
             
-            # Formatear el nombre para el GIF
-            if heuristic == "Ninguna":
-                gif_name = f"resultados/gifs/{safe_algo_name}_{map_name}.gif"
-                display_name = algo_name
-            else:
-                gif_name = f"resultados/gifs/{safe_algo_name}_{map_name}_{heuristic}.gif"
-                display_name = f"{algo_name} ({heuristic})"
-                
+            display_name = algo_name if heuristic == "Ninguna" else f"{algo_name} ({heuristic})"
+            gif_name = f"resultados/gifs/{safe_algo_name}_{map_name}_{heuristic}.gif"
+
             print(f"\nCorriendo {map_name} con {display_name}...")
-            
             game = SokobanGame(load_map(map_path))
             
-            # Medimos tiempo y buscamos, con protección contra MemoryError
             start_time = time.time()
             try:
-                path, expanded, frontier = algo_instance.search(game)
+                path, expanded, frontier = algo_instance.search(game, max_nodes=MAX_NODES)
                 elapsed_time = time.time() - start_time
-                steps = len(path) if path else 0
-            except MemoryError:
-                print(f"--- [AVISO] Se agotó la RAM (MemoryError) para {algo_name} en {map_name} ---")
-                path = None
-                expanded = "OOM"
-                frontier = "OOM"
-                elapsed_time = time.time() - start_time
-                steps = "OOM"
-            
-            # Guardar métricas
-            results.append({
-                "Map": map_name,
-                "Algorithm": algo_name,
-                "Heuristic": heuristic,
-                "Time (s)": elapsed_time,
-                "Expanded Nodes": expanded,
-                "Frontier Nodes": frontier,
-                "Steps": steps,
-                "Full_Name": display_name
-            })
-            
-            # Generar el GIF pasando el camino precalculado (solo si encontró solución y no dio OOM)
-            if path:
-                print(f"Generando GIF: {gif_name}")
-                game_for_viz = SokobanGame(load_map(map_path)) # Resetear mapa para el visualizador
-                run_visualization(
-                    game_for_viz, 
-                    precomputed_path=path, 
-                    save_video=True, 
-                    output_filename=gif_name, 
-                    auto_close=True
-                )
-            else:
-                print("No se encontró solución o hubo falta de memoria (Omitiendo GIF).")
-
-    # Guardar CSV con los datos crudos
-    df = pd.DataFrame(results)
-    df.to_csv("resultados/metricas_completas.csv", index=False)
-    print("\nBenchmark terminado. Generando gráficos...")
-    generate_plots(df)
-
-# --- FUNCIONES DE GRAFICADO ---
-
-def plot_4_metrics(data, x_col, hue_col, title, filename):
-    """Función auxiliar para crear un panel de 4 gráficos (2x2) y guardarlo."""
-    if data.empty:
-        return
-        
-    # Copiamos la data para no alterar el DataFrame original y limpiamos los OOM para los gráficos
-    plot_data = data.copy()
-    
-    # Reemplazamos los "OOM" por NaN para que seaborn no tire error al intentar graficar texto
-    cols_to_clean = ["Expanded Nodes", "Frontier Nodes", "Steps"]
-    for col in cols_to_clean:
-        plot_data[col] = pd.to_numeric(plot_data[col].replace("OOM", np.nan), errors='coerce')
-        
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle(title, fontsize=16, fontweight='bold')
-    
-    metrics = ["Time (s)", "Expanded Nodes", "Frontier Nodes", "Steps"]
-    titles = ["Tiempo de Resolución", "Nodos Expandidos", "Nodos Frontera", "Pasos (Costo de Solución)"]
-    
-    for i, ax in enumerate(axes.flatten()):
-        metric = metrics[i]
-        
-        # Graficamos
-        sns.barplot(data=plot_data, x=x_col, y=metric, hue=hue_col, ax=ax, palette="viridis")
-        ax.set_title(titles[i])
-        ax.set_ylabel(metric)
-        ax.set_xlabel(x_col)
-        
-        # Mostrar valores encima de las barras (solo si no es NaN)
-        for container in ax.containers:
-            labels = []
-            for v in container.datavalues:
-                if pd.isna(v):
-                    labels.append('OOM')
+                
+                if expanded == "LIMIT":
+                    steps = "LIMIT"
+                    print(f"--- Límite alcanzado para {display_name} ---")
                 else:
-                    labels.append(f'{v:.2f}' if metric == "Time (s)" else f'{int(v)}')
-            ax.bar_label(container, labels=labels, padding=3, size=9)
+                    steps = len(path) if path else 0
+                    print(f"--- Completado en {elapsed_time:.2f}s ---")
+
+            except Exception as e:
+                print(f"Error inesperado en {display_name}: {e}")
+                path, expanded, frontier, steps = None, "ERROR", "ERROR", "ERROR"
+                elapsed_time = time.time() - start_time
+
+            # Agregamos el resultado actual a la lista
+            new_result = {
+                "Map": map_name, 
+                "Algorithm": algo_name, 
+                "Heuristic": heuristic,
+                "Time (s)": elapsed_time, 
+                "Expanded Nodes": expanded,
+                "Frontier Nodes": frontier, 
+                "Steps": steps, 
+                "Full_Name": display_name
+            }
+            results.append(new_result)
             
-    plt.tight_layout()
-    plt.savefig(f"resultados/graficos/{filename}.png")
-    plt.close()
+            # --- GUARDADO INCREMENTAL ---
+            # Guardamos el DataFrame entero cada vez que termina un algoritmo.
+            # Así, si cortás con Ctrl+C o la PC se reinicia, no perdés nada.
+            pd.DataFrame(results).to_csv(CSV_PATH, index=False)
+            
+            if path and steps != "LIMIT":
+                print(f"Generando GIF...")
+                game_for_viz = SokobanGame(load_map(map_path))
+                run_visualization(game_for_viz, precomputed_path=path, save_video=True, 
+                                  output_filename=gif_name, auto_close=True)
 
-def generate_plots(df):
-    # 1. A* vs Greedy (Manhattan) por Mapa
-    data_1 = df[(df["Algorithm"].isin(["A*", "Greedy"])) & (df["Heuristic"] == "manhattan")]
-    plot_4_metrics(data_1, "Map", "Algorithm", "A* vs Greedy (Heurística: Manhattan)", "1_AStar_vs_Greedy_Manhattan")
-
-    # 2. A* vs Greedy (Manhattan Player) por Mapa
-    data_2 = df[(df["Algorithm"].isin(["A*", "Greedy"])) & (df["Heuristic"] == "manhattan_player")]
-    plot_4_metrics(data_2, "Map", "Algorithm", "A* vs Greedy (Heurística: Manhattan Player)", "2_AStar_vs_Greedy_ManhattanPlayer")
-
-    # 3. BFS vs DFS por Mapa
-    data_3 = df[df["Algorithm"].isin(["BFS", "DFS"])]
-    plot_4_metrics(data_3, "Map", "Algorithm", "BFS vs DFS (No Informados)", "3_BFS_vs_DFS")
-
-    # 4. A* (Manhattan Player) en todos los mapas
-    data_4 = df[(df["Algorithm"] == "A*") & (df["Heuristic"] == "manhattan_player")].copy()
-    data_4["Algo_Hue"] = "A* (Manhattan Player)" # Hue dummy para formato de barras
-    plot_4_metrics(data_4, "Map", "Algo_Hue", "Evolución A* (Manhattan Player) según Mapa", "4_AStar_ManhattanPlayer_Evolution")
-
-    # 5. A* (Manhattan) en todos los mapas
-    data_5 = df[(df["Algorithm"] == "A*") & (df["Heuristic"] == "manhattan")].copy()
-    data_5["Algo_Hue"] = "A* (Manhattan)"
-    plot_4_metrics(data_5, "Map", "Algo_Hue", "Evolución A* (Manhattan) según Mapa", "5_AStar_Manhattan_Evolution")
-
-    # 6. Greedy (Manhattan Player) en todos los mapas
-    data_6 = df[(df["Algorithm"] == "Greedy") & (df["Heuristic"] == "manhattan_player")].copy()
-    data_6["Algo_Hue"] = "Greedy (Manhattan Player)"
-    plot_4_metrics(data_6, "Map", "Algo_Hue", "Evolución Greedy (Manhattan Player) según Mapa", "6_Greedy_ManhattanPlayer_Evolution")
-
-    # 7. Greedy (Manhattan) en todos los mapas
-    data_7 = df[(df["Algorithm"] == "Greedy") & (df["Heuristic"] == "manhattan")].copy()
-    data_7["Algo_Hue"] = "Greedy (Manhattan)"
-    plot_4_metrics(data_7, "Map", "Algo_Hue", "Evolución Greedy (Manhattan) según Mapa", "7_Greedy_Manhattan_Evolution")
-
-    # 8. DFS en todos los mapas
-    data_8 = df[df["Algorithm"] == "DFS"].copy()
-    data_8["Algo_Hue"] = "DFS"
-    plot_4_metrics(data_8, "Map", "Algo_Hue", "Evolución DFS según Mapa", "8_DFS_Evolution")
-
-    # 9. BFS en todos los mapas
-    data_9 = df[df["Algorithm"] == "BFS"].copy()
-    data_9["Algo_Hue"] = "BFS"
-    plot_4_metrics(data_9, "Map", "Algo_Hue", "Evolución BFS según Mapa", "9_BFS_Evolution")
-
-    # 10. Resumen Global (Todos los algoritmos en todos los mapas)
-    plot_4_metrics(df, "Map", "Full_Name", "Comparativa Global de Todos los Algoritmos", "10_Global_Overview")
-
-    print("¡Todos los gráficos han sido generados en la carpeta 'resultados/graficos'!")
+    print("\n==================================================")
+    print(" BENCHMARK FINALIZADO ")
+    print(f" Resultados guardados en: {CSV_PATH}")
+    print(" Ahora podés correr 'plotter.py' para generar los gráficos.")
+    print("==================================================")
 
 if __name__ == "__main__":
     run_benchmarks()

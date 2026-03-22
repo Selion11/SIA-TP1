@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class SearchAlgorithm(ABC):
     @abstractmethod
-    def search(self, game):
+    def search(self, game,max_nodes=12000000):
         """
         Ejecuta el algoritmo de búsqueda para el juego dado.
         

@@ -52,7 +52,7 @@ class SokobanGame:
     def get_successors(self, state):
         """
         Genera los siguientes estados válidos a partir del estado actual.
-        INCLUYE PODA POR DEADLOCKS DE ESQUINA.
+        INCLUYE PODA POR DEADLOCKS DE ESQUINA Y NORMALIZACIÓN DE ESTADOS.
         """
         player, boxes = state
         successors = []
@@ -67,26 +67,35 @@ class SokobanGame:
             new_r, new_c = player[0] + dr, player[1] + dc
             new_p = (new_r, new_c)
 
+            # Si el jugador choca contra una pared, descartamos la acción
             if new_p in self.walls:
                 continue
 
+            # Si el jugador choca contra una caja
             if new_p in boxes:
                 new_box_r, new_box_c = new_r + dr, new_c + dc
                 new_box = (new_box_r, new_box_c)
 
+                # Si detrás de la caja hay otra caja o una pared, no se puede empujar
                 if new_box in self.walls or new_box in boxes:
                     continue
 
+                # PODA: Si empujar la caja genera un deadlock de esquina, descartamos la acción
                 if self._is_corner_deadlock(new_box_r, new_box_c):
                     continue
 
+                # Actualizamos la posición de la caja
                 new_boxes_list = list(boxes)
                 new_boxes_list.remove(new_p)
                 new_boxes_list.append(new_box)
-                new_boxes = tuple(new_boxes_list)
+                
+                # ---> CORRECCIÓN CLAVE: Ordenar las cajas <---
+                # Convertimos a tupla ORDENADA para que el estado sea único e inmutable
+                new_boxes = tuple(sorted(new_boxes_list))
                 
                 successors.append(((new_p, new_boxes), action))
             
+            # Si el jugador se mueve a un espacio vacío (o a una meta sin caja)
             else:
                 successors.append(((new_p, boxes), action))
 

@@ -1,7 +1,0 @@
-Map,Algorithm,Heuristic,Time (s),Expanded Nodes,Frontier Nodes,Steps,Full_Name
-level_3,BFS,Ninguna,0.028860092163085938,2825,528,18,BFS
-level_3,DFS,Ninguna,0.10164499282836914,4088,224,364,DFS
-level_3,A*,manhattan,0.016781330108642578,1262,379,18,A* (manhattan)
-level_3,A*,manhattan_player,0.012874364852905273,950,413,18,A* (manhattan_player)
-level_3,Greedy,manhattan,0.004241943359375,420,54,22,Greedy (manhattan)
-level_3,Greedy,manhattan_player,0.04459571838378906,1186,581,28,Greedy (manhattan_player)

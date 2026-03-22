@@ -7,13 +7,15 @@ from .heuristics import heuristic_manhattan, heuristic_manhattan_player
 
 class Greedy(SearchAlgorithm):
     # Límite en infinito para el benchmark
-    def __init__(self, heuristic_name="manhattan", max_nodes=float('inf')):
+    def __init__(self, heuristic_name="manhattan", max_nodes=12000000):
         self.max_nodes = max_nodes
         self.heuristic_name = heuristic_name
 
-    def search(self, game):
+    def search(self, game,max_nodes=12000000):
         initial_state = game.get_initial_state()
         goals = game.goals
+        self.max_nodes = max_nodes
+
         
         # Chequeo por si el mapa ya arranca ganado
         if game.is_goal(initial_state):
@@ -38,7 +40,7 @@ class Greedy(SearchAlgorithm):
         visited = set()
         nodes_expanded = 0
         start_time = time.time()
-
+        last_log_time = start_time
         print(f"--- Iniciando búsqueda GREEDY (Heurística: {self.heuristic_name}) ---")
 
         while frontier:
@@ -49,6 +51,13 @@ class Greedy(SearchAlgorithm):
 
             visited.add(state)
             nodes_expanded += 1
+            
+            if nodes_expanded % 100000 == 0: # Chequea cada 100k nodos para no ser pesado
+                current_time = time.time()
+                if current_time - last_log_time >= 10:
+                    elapsed = current_time - start_time
+                    print(f"   [VIVO] {nodes_expanded/1000000:.1f}M nodos... | Tiempo: {int(elapsed)}s | Frontera: {len(frontier)}")
+                    last_log_time = current_time
 
             # if nodes_expanded % 1000 == 0:
             #     elapsed = time.time() - start_time
@@ -56,7 +65,7 @@ class Greedy(SearchAlgorithm):
 
             if nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
-                return None, nodes_expanded, len(frontier)
+                return None, "LIMIT", "LIMIT"
 
             for next_state, action in game.get_successors(state):
                 if next_state not in visited:
@@ -71,4 +80,4 @@ class Greedy(SearchAlgorithm):
                     h = h_func(next_state)
                     heapq.heappush(frontier, (h, next(tie_breaker), next_state, new_path))
 
-        return None, nodes_expanded
+        return None, nodes_expanded, len(frontier)
