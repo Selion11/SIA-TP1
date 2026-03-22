@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sokoban import SokobanGame
+from games.sokoban import SokobanGame
 from search_engines.bfs import BFS
 from search_engines.dfs import DFS
 from search_engines.a_star import AStar

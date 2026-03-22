@@ -1,70 +1,84 @@
-import time
-import heapq
-from .search_algorithm import SearchAlgorithm
-from .heuristics import heuristic_manhattan, heuristic_manhattan_player
+import sys
+import yaml
+from games.sokoban import SokobanGame
+from search_engines.bfs import BFS
+from search_engines.dfs import DFS
+from search_engines.a_star import AStar
+from search_engines.greedy import Greedy
 
-class AStar(SearchAlgorithm):
-    # Cambiamos a infinito (float('inf')) para que no se corte en el benchmark
-    def __init__(self, heuristic_name="manhattan", max_nodes=float('inf')):
-        self.max_nodes = max_nodes
-        self.heuristic_name = heuristic_name
+def load_config(config_file="config.yaml"):
+    try:
+        with open(config_file, 'r', encoding='utf-8') as file:
+            return yaml.safe_load(file) or {}
+    except Exception as e:
+        print(f"Error loading config file: {e}")
+        sys.exit(1)
 
-    def search(self, game):
-        initial_state = game.get_initial_state()
-        goals = game.goals
+def load_map(map_path):
+    try:
+        with open(map_path, 'r', encoding='utf-8') as file:
+            # We don't strip spaces at the right because it might affect board dimensions in some implementations, 
+            # but rstrip('\n') is fine. Let's just strictly keep the lines except trailing newlines.
+            return [line.rstrip('\n') for line in file.readlines()]
+    except Exception as e:
+        print(f"Error loading map file: {e}")
+        sys.exit(1)
+
+def run(force_no_visualize=False):
+    config = load_config()
+    
+    map_path = config.get("board", "maps/level_1.txt")
+    algorithm = config.get("algorithm", "bfs")
+    visualize = config.get("visualize", False)
+    save_video = config.get("save_video",True)
+    output_filename = config.get("output_filename","sokoban_output.gif")
+    heuristic = config.get("heuristic", "manhattan")
+    
+    map_data = load_map(map_path)
+    game = SokobanGame(map_data)
+    
+    print(f"Buscando solución con algoritmo: {algorithm.upper()}...")
+    
+    algorithms = {
+        "bfs": BFS(),
+        "dfs": DFS(),
+        "a*": AStar(heuristic_name=heuristic),
+        "greedy": Greedy(heuristic_name=heuristic)
+    }
+    
+    algo_instance = algorithms.get(algorithm.lower())
+    
+    if algo_instance is None:
+        print(f"El algoritmo '{algorithm}' no está soportado aún.")
+        sys.exit(1)
         
-        # --- SELECCIÓN DINÁMICA DE HEURÍSTICA ---
-        if self.heuristic_name == "manhattan":
-            h_func = lambda s: heuristic_manhattan(s, goals)
-        elif self.heuristic_name == "manhattan_player":
-            h_func = lambda s: heuristic_manhattan_player(s, goals)
-        else:
-            print(f"[Aviso] Heurística '{self.heuristic_name}' no reconocida. Usando h=0 (Dijkstra).")
-            h_func = lambda s: 0 
-            
-        frontier = []
-        tie_breaker = 0 
-        
-        heapq.heappush(frontier, (h_func(initial_state), tie_breaker, 0, initial_state, []))
-        best_costs = {initial_state: 0}
-        
-        nodes_expanded = 0
+    # --- BLOQUE FINAL CORREGIDO ---
+    if visualize and not force_no_visualize:
+        # MODO GRÁFICO: Le pasamos el algoritmo al visualizador y él hace la búsqueda 1 sola vez
+        try:
+            from visualizer import run_visualization
+            print("Abriendo ventana gráfica para buscar y visualizar...")
+            run_visualization(game, algorithm=algo_instance)
+        except ImportError as e:
+            print("No se pudo iniciar la visualización. Probablemente falta instalar 'pygame'.")
+            print(f"Error: {e}")
+    else:
+        import time
         start_time = time.time()
-
-        print(f"--- Iniciando búsqueda A* (Heurística: {self.heuristic_name}) ---")
         
-        while frontier:
-            f_cost, _, g_cost, state, path = heapq.heappop(frontier)
+        solution, nodes, frontier_nodes = algo_instance.search(game)
+        
+        elapsed = time.time() - start_time
+        
+        if solution is not None:
+            print(f"¡Éxito! Resuelto en {elapsed:.3f} segundos.")
+            print(f"Pasos: {len(solution)}")
+            print(f"Camino: {' -> '.join(solution)}")
+            print(f"Nodos expandidos: {nodes}")
+            print(f"Nodos frontera (sin expandir): {frontier_nodes}")
+        else:
+            print(f"No se encontró solución luego de {elapsed:.3f} segundos y {nodes} nodos.")
+            print(f"Nodos frontera remanentes: {frontier_nodes}")
             
-            if g_cost > best_costs.get(state, float('inf')):
-                continue
-
-            nodes_expanded += 1
-
-            if nodes_expanded % 1000 == 0:
-                elapsed = time.time() - start_time
-                print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | f_cost actual: {f_cost} | Tiempo: {elapsed:.2f}s")
-
-            # Ahora como max_nodes es infinito, esto nunca va a cortar la búsqueda
-            # a menos que le pases un número explícitamente desde main.py
-            if nodes_expanded > self.max_nodes:
-                print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
-                return None, nodes_expanded, len(frontier)
-
-            if game.is_goal(state):
-                print(f"--- ¡Solución encontrada! ---")
-                return path, nodes_expanded, len(frontier)
-
-            for next_state, action in game.get_successors(state):
-                new_g_cost = g_cost + 1 
-                
-                if new_g_cost < best_costs.get(next_state, float('inf')):
-                    best_costs[next_state] = new_g_cost
-                    
-                    h_cost = h_func(next_state)
-                    new_f_cost = new_g_cost + h_cost
-                    
-                    tie_breaker += 1
-                    heapq.heappush(frontier, (new_f_cost, tie_breaker, new_g_cost, next_state, path + [action]))
-        
-        return None, nodes_expanded, len(frontier)
+if __name__ == "__main__":
+    run()
