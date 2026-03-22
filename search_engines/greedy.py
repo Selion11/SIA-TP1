@@ -50,9 +50,9 @@ class Greedy(SearchAlgorithm):
             visited.add(state)
             nodes_expanded += 1
 
-            if nodes_expanded % 1000 == 0:
-                elapsed = time.time() - start_time
-                print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
+            # if nodes_expanded % 1000 == 0:
+            #     elapsed = time.time() - start_time
+            #     print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
 
             if nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")

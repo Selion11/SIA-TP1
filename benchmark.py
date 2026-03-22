@@ -3,6 +3,7 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 from games.sokoban import SokobanGame
 from search_engines.bfs import BFS
@@ -19,7 +20,8 @@ def load_map(filename):
         return [list(line.rstrip('\n')) for line in f.readlines()]
 
 def run_benchmarks():
-    maps = ["level_4.txt", "level_5.txt", "level_6.txt", "level_7.txt"]
+    # maps = ["level_4.txt", "level_5.txt", "level_6.txt", "level_7.txt"]
+    maps = ["level_3.txt"]
     
     # Definimos todas las combinaciones que pediste
     runs = [
@@ -55,24 +57,33 @@ def run_benchmarks():
             heuristic = run["heuristic"]
             algo_instance = run["algo_obj"]
             
+            safe_algo_name = algo_name.replace("*", "star").lower()
+            
             # Formatear el nombre para el GIF
             if heuristic == "Ninguna":
-                gif_name = f"resultados/gifs/{algo_name.lower()}_{map_name}.gif"
+                gif_name = f"resultados/gifs/{safe_algo_name}_{map_name}.gif"
                 display_name = algo_name
             else:
-                gif_name = f"resultados/gifs/{algo_name.lower()}_{map_name}_{heuristic}.gif"
+                gif_name = f"resultados/gifs/{safe_algo_name}_{map_name}_{heuristic}.gif"
                 display_name = f"{algo_name} ({heuristic})"
                 
             print(f"\nCorriendo {map_name} con {display_name}...")
             
             game = SokobanGame(load_map(map_path))
             
-            # Medimos tiempo y buscamos
+            # Medimos tiempo y buscamos, con protección contra MemoryError
             start_time = time.time()
-            path, expanded, frontier = algo_instance.search(game)
-            elapsed_time = time.time() - start_time
-            
-            steps = len(path) if path else 0
+            try:
+                path, expanded, frontier = algo_instance.search(game)
+                elapsed_time = time.time() - start_time
+                steps = len(path) if path else 0
+            except MemoryError:
+                print(f"--- [AVISO] Se agotó la RAM (MemoryError) para {algo_name} en {map_name} ---")
+                path = None
+                expanded = "OOM"
+                frontier = "OOM"
+                elapsed_time = time.time() - start_time
+                steps = "OOM"
             
             # Guardar métricas
             results.append({
@@ -86,7 +97,7 @@ def run_benchmarks():
                 "Full_Name": display_name
             })
             
-            # Generar el GIF pasando el camino precalculado (solo si encontró solución)
+            # Generar el GIF pasando el camino precalculado (solo si encontró solución y no dio OOM)
             if path:
                 print(f"Generando GIF: {gif_name}")
                 game_for_viz = SokobanGame(load_map(map_path)) # Resetear mapa para el visualizador
@@ -95,10 +106,10 @@ def run_benchmarks():
                     precomputed_path=path, 
                     save_video=True, 
                     output_filename=gif_name, 
-                    auto_close=True # Se cierra solo al terminar de grabar
+                    auto_close=True
                 )
             else:
-                print("No se encontró solución (Omitiendo GIF).")
+                print("No se encontró solución o hubo falta de memoria (Omitiendo GIF).")
 
     # Guardar CSV con los datos crudos
     df = pd.DataFrame(results)
@@ -113,6 +124,14 @@ def plot_4_metrics(data, x_col, hue_col, title, filename):
     if data.empty:
         return
         
+    # Copiamos la data para no alterar el DataFrame original y limpiamos los OOM para los gráficos
+    plot_data = data.copy()
+    
+    # Reemplazamos los "OOM" por NaN para que seaborn no tire error al intentar graficar texto
+    cols_to_clean = ["Expanded Nodes", "Frontier Nodes", "Steps"]
+    for col in cols_to_clean:
+        plot_data[col] = pd.to_numeric(plot_data[col].replace("OOM", np.nan), errors='coerce')
+        
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle(title, fontsize=16, fontweight='bold')
     
@@ -121,13 +140,22 @@ def plot_4_metrics(data, x_col, hue_col, title, filename):
     
     for i, ax in enumerate(axes.flatten()):
         metric = metrics[i]
-        sns.barplot(data=data, x=x_col, y=metric, hue=hue_col, ax=ax, palette="viridis")
+        
+        # Graficamos
+        sns.barplot(data=plot_data, x=x_col, y=metric, hue=hue_col, ax=ax, palette="viridis")
         ax.set_title(titles[i])
         ax.set_ylabel(metric)
         ax.set_xlabel(x_col)
-        # Mostrar valores encima de las barras
+        
+        # Mostrar valores encima de las barras (solo si no es NaN)
         for container in ax.containers:
-            ax.bar_label(container, fmt='%.2f' if metric == "Time (s)" else '%d', padding=3, size=9)
+            labels = []
+            for v in container.datavalues:
+                if pd.isna(v):
+                    labels.append('OOM')
+                else:
+                    labels.append(f'{v:.2f}' if metric == "Time (s)" else f'{int(v)}')
+            ax.bar_label(container, labels=labels, padding=3, size=9)
             
     plt.tight_layout()
     plt.savefig(f"resultados/graficos/{filename}.png")
@@ -175,6 +203,9 @@ def generate_plots(df):
     data_9 = df[df["Algorithm"] == "BFS"].copy()
     data_9["Algo_Hue"] = "BFS"
     plot_4_metrics(data_9, "Map", "Algo_Hue", "Evolución BFS según Mapa", "9_BFS_Evolution")
+
+    # 10. Resumen Global (Todos los algoritmos en todos los mapas)
+    plot_4_metrics(df, "Map", "Full_Name", "Comparativa Global de Todos los Algoritmos", "10_Global_Overview")
 
     print("¡Todos los gráficos han sido generados en la carpeta 'resultados/graficos'!")
 

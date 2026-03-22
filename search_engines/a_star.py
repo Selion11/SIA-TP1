@@ -41,9 +41,9 @@ class AStar(SearchAlgorithm):
 
             nodes_expanded += 1
 
-            if nodes_expanded % 1000 == 0:
-                elapsed = time.time() - start_time
-                print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | f_cost actual: {f_cost} | Tiempo: {elapsed:.2f}s")
+            # if nodes_expanded % 1000 == 0:
+            #     elapsed = time.time() - start_time
+            #     print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | f_cost actual: {f_cost} | Tiempo: {elapsed:.2f}s")
 
             # Ahora como max_nodes es infinito, esto nunca va a cortar la búsqueda
             # a menos que le pases un número explícitamente desde main.py
