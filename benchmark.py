@@ -20,10 +20,23 @@ def run_benchmarks():
     MAX_NODES = 12000000  # Límite de 12 Millones de nodos
     CSV_PATH = "resultados/metricas_completas.csv"
     
-    # --- NUEVA ESTRUCTURA DE RUNS ---
-    # Diccionario: { "mapa.txt": [ lista_de_algoritmos_a_correr ] }
-    # Esto te permite comentar/descomentar mapas o algoritmos fácilmente.
     runs_plan = {
+        "level_1.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
+        "level_2.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
         "level_3.txt": [
             {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
             {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
@@ -56,28 +69,30 @@ def run_benchmarks():
             {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
             {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
         ],
-        "level_7.txt": [
-            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
-            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
-            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
-            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
-            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
-            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
-        ]
+        # "level_7.txt": [
+        #     {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+        #     {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+        #     {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+        #     {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+        #     {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+        #     {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        # ]
     }
 
     os.makedirs("resultados/gifs", exist_ok=True)
     os.makedirs("resultados", exist_ok=True)
 
-    # Si el archivo CSV ya existe, cargamos los datos previos para no pisarlos.
-    # Si no existe, creamos una lista vacía.
+    # --- 1. MEMORIA DE CORRIDAS PREVIAS ---
+    completed_runs = set()
     if os.path.exists(CSV_PATH):
-        print(f"--- [INFO] Archivo {CSV_PATH} encontrado. Se agregarán los nuevos resultados. ---")
-        existing_df = pd.read_csv(CSV_PATH)
-        results = existing_df.to_dict('records')
-    else:
-        print(f"--- [INFO] Creando nuevo archivo {CSV_PATH}. ---")
-        results = []
+        try:
+            df_existing = pd.read_csv(CSV_PATH)
+            # Guardamos tuplas de (Mapa, Nombre_Algoritmo) que ya están en el CSV
+            for _, row in df_existing.iterrows():
+                completed_runs.add((row['Map'], row['Full_Name']))
+            print(f"--- [INFO] Se encontraron {len(completed_runs)} corridas previas en {CSV_PATH}. Se omitirán. ---")
+        except Exception as e:
+            print(f"--- [AVISO] El CSV existe pero hubo un error al leerlo: {e}. Empezando de cero. ---")
 
     print("==================================================")
     print(f" INICIANDO BENCHMARK (Límite: {MAX_NODES} nodos) ")
@@ -86,7 +101,6 @@ def run_benchmarks():
     for map_file, runs in runs_plan.items():
         map_path = os.path.join("maps", map_file)
         if not os.path.exists(map_path): 
-            print(f"--- [AVISO] El mapa {map_file} no existe en la carpeta 'maps/'. Saltando... ---")
             continue
             
         map_name = map_file.split(".")[0]
@@ -96,11 +110,15 @@ def run_benchmarks():
             heuristic = run["heuristic"]
             algo_instance = run["algo_obj"]
             safe_algo_name = algo_name.replace("*", "star").lower()
-            
             display_name = algo_name if heuristic == "Ninguna" else f"{algo_name} ({heuristic})"
             gif_name = f"resultados/gifs/{safe_algo_name}_{map_name}_{heuristic}.gif"
 
-            print(f"\nCorriendo {map_name} con {display_name}...")
+            # --- 2. VERIFICACIÓN ANTES DE CORRER ---
+            if (map_name, display_name) in completed_runs:
+                print(f"⏩ Saltando {map_name} con {display_name} (Ya calculado anteriormente)")
+                continue
+
+            print(f"\n▶️ Corriendo {map_name} con {display_name}...")
             game = SokobanGame(load_map(map_path))
             
             start_time = time.time()
@@ -110,17 +128,16 @@ def run_benchmarks():
                 
                 if expanded == "LIMIT":
                     steps = "LIMIT"
-                    print(f"--- Límite alcanzado para {display_name} ---")
+                    print(f"--- ⚠️ Límite alcanzado para {display_name} ---")
                 else:
                     steps = len(path) if path else 0
-                    print(f"--- Completado en {elapsed_time:.2f}s ---")
+                    print(f"--- ✅ Completado en {elapsed_time:.2f}s ---")
 
             except Exception as e:
-                print(f"Error inesperado en {display_name}: {e}")
+                print(f"--- ❌ Error inesperado en {display_name}: {e} ---")
                 path, expanded, frontier, steps = None, "ERROR", "ERROR", "ERROR"
                 elapsed_time = time.time() - start_time
 
-            # Agregamos el resultado actual a la lista
             new_result = {
                 "Map": map_name, 
                 "Algorithm": algo_name, 
@@ -131,12 +148,15 @@ def run_benchmarks():
                 "Steps": steps, 
                 "Full_Name": display_name
             }
-            results.append(new_result)
             
-            # --- GUARDADO INCREMENTAL ---
-            # Guardamos el DataFrame entero cada vez que termina un algoritmo.
-            # Así, si cortás con Ctrl+C o la PC se reinicia, no perdés nada.
-            pd.DataFrame(results).to_csv(CSV_PATH, index=False)
+            # --- 3. APPEND AL CSV ---
+            # Verificamos si el archivo existe en ESTE exacto momento para saber si le ponemos las cabeceras (header)
+            file_exists = os.path.isfile(CSV_PATH)
+            df_new = pd.DataFrame([new_result]) # Metemos el dict en una lista para hacer 1 sola fila
+            df_new.to_csv(CSV_PATH, mode='a', header=not file_exists, index=False)
+            
+            # Agregamos al set por si el mismo algoritmo estuviera duplicado en el diccionario
+            completed_runs.add((map_name, display_name))
             
             if path and steps != "LIMIT":
                 print(f"Generando GIF...")
@@ -147,7 +167,6 @@ def run_benchmarks():
     print("\n==================================================")
     print(" BENCHMARK FINALIZADO ")
     print(f" Resultados guardados en: {CSV_PATH}")
-    print(" Ahora podés correr 'plotter.py' para generar los gráficos.")
     print("==================================================")
 
 if __name__ == "__main__":
