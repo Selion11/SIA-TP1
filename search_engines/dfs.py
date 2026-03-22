@@ -2,12 +2,17 @@ import time
 from .search_algorithm import SearchAlgorithm
 
 class DFS(SearchAlgorithm):
-    def __init__(self, max_nodes=500000):
+    # Límite en infinito para el benchmark
+    def __init__(self, max_nodes=float('inf')):
         self.max_nodes = max_nodes
 
     def search(self, game):
         initial_state = game.get_initial_state()
         
+        # Chequeo por si el mapa ya arranca ganado
+        if game.is_goal(initial_state):
+            return [], 0, 0
+            
         frontier = [(initial_state, [])]
         visited = set()
         nodes_expanded = 0
@@ -32,13 +37,15 @@ class DFS(SearchAlgorithm):
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
                 return None, nodes_expanded, len(frontier)
 
-            if game.is_goal(state):
-                print(f"--- ¡Solución encontrada! ---")
-                return path, nodes_expanded, len(frontier)
-
             for next_state, action in game.get_successors(state):
                 if next_state not in visited:
-                    frontier.append((next_state, path + [action]))
+                    new_path = path + [action]
+                    
+                    # EARLY GOAL TEST: Frenamos ni bien generamos la solución
+                    if game.is_goal(next_state):
+                        print(f"--- ¡Solución encontrada! ---")
+                        return new_path, nodes_expanded, len(frontier)
+                        
+                    frontier.append((next_state, new_path))
         
         return None, nodes_expanded, len(frontier)
-    

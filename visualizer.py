@@ -22,7 +22,7 @@ TEXT_COLOR = (255, 255, 255)
 
 TILE_SIZE = 50
 
-def run_visualization(game, algorithm=None, precomputed_path=None, save_video=False, output_filename="solucion.gif"):
+def run_visualization(game, algorithm=None, precomputed_path=None, save_video=False, output_filename="solucion.gif",auto_close=False):
     if 'pygame' not in sys.modules:
         print("La librería 'pygame' no está instalada. Ejecutá 'pip install pygame'")
         return
@@ -35,7 +35,7 @@ def run_visualization(game, algorithm=None, precomputed_path=None, save_video=Fa
     pygame.font.init()
     font = pygame.font.SysFont("Arial", 22, bold=True)
     
-    entities = game.walls | game.goals | game.initial_boxes | {game.player_start}
+    entities = game.walls | game.goals | set(game.initial_boxes) | {game.player_start}   
     max_r = max((r for r, c in entities), default=0)
     max_c = max((c for r, c in entities), default=0)
 
@@ -160,6 +160,10 @@ def run_visualization(game, algorithm=None, precomputed_path=None, save_video=Fa
         for _ in range(5): capture_frame()
         writer.close()
         print(f"--- ¡Archivo multimedia guardado exitosamente como '{output_filename}'! ---")
+    
+    if auto_close:
+        pygame.quit()
+        return
     
     running = True
     while running:

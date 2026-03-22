@@ -3,16 +3,21 @@ import time
 from itertools import count
 
 from .search_algorithm import SearchAlgorithm
-from .heuristics import heuristic_manhattan, heuristic_manhattan_player # <-- Importamos las heurísticas
+from .heuristics import heuristic_manhattan, heuristic_manhattan_player
 
 class Greedy(SearchAlgorithm):
-    def __init__(self, heuristic_name="manhattan", max_nodes=500000):
+    # Límite en infinito para el benchmark
+    def __init__(self, heuristic_name="manhattan", max_nodes=float('inf')):
         self.max_nodes = max_nodes
         self.heuristic_name = heuristic_name
 
     def search(self, game):
         initial_state = game.get_initial_state()
         goals = game.goals
+        
+        # Chequeo por si el mapa ya arranca ganado
+        if game.is_goal(initial_state):
+            return [], 0, 0
         
         # --- SELECCIÓN DINÁMICA DE HEURÍSTICA ---
         if self.heuristic_name == "manhattan":
@@ -26,7 +31,10 @@ class Greedy(SearchAlgorithm):
         tie_breaker = count()
         initial_h = h_func(initial_state)
 
-        frontier = [(initial_h, next(tie_breaker), initial_state, [])]
+        # Iniciamos la frontera con el estado inicial
+        frontier = []
+        heapq.heappush(frontier, (initial_h, next(tie_breaker), initial_state, []))
+        
         visited = set()
         nodes_expanded = 0
         start_time = time.time()
@@ -50,13 +58,17 @@ class Greedy(SearchAlgorithm):
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
                 return None, nodes_expanded, len(frontier)
 
-            if game.is_goal(state):
-                print(f"--- ¡Solución encontrada! ---")
-                return path, nodes_expanded, len(frontier)
-
             for next_state, action in game.get_successors(state):
                 if next_state not in visited:
+                    new_path = path + [action]
+                    
+                    # EARLY GOAL TEST: Frenamos de inmediato al tocar la meta.
+                    # Como Greedy no es óptimo, no perdemos nada y ganamos velocidad.
+                    if game.is_goal(next_state):
+                        print(f"--- ¡Solución encontrada! ---")
+                        return new_path, nodes_expanded, len(frontier)
+                        
                     h = h_func(next_state)
-                    heapq.heappush(frontier, (h, next(tie_breaker), next_state, path + [action]))
+                    heapq.heappush(frontier, (h, next(tie_breaker), next_state, new_path))
 
-        return None, nodes_expanded, len(frontier)
+        return None, nodes_expanded

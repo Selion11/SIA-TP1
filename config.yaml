@@ -1,6 +1,6 @@
-board: "maps/level_4.txt"
+board: "maps/level_1.txt"
 algorithm: "a*"
 heuristic: "manhattan"
 visualize: true
-save_video: true
+save_video: false
 output_filename: "level_4_sokoban_a*_manhattan.gif"

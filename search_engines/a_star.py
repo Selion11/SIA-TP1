@@ -3,9 +3,9 @@ import heapq
 from .search_algorithm import SearchAlgorithm
 from .heuristics import heuristic_manhattan, heuristic_manhattan_player
 
-
 class AStar(SearchAlgorithm):
-    def __init__(self, heuristic_name="manhattan", max_nodes=500000):
+    # Cambiamos a infinito (float('inf')) para que no se corte en el benchmark
+    def __init__(self, heuristic_name="manhattan", max_nodes=float('inf')):
         self.max_nodes = max_nodes
         self.heuristic_name = heuristic_name
 
@@ -27,27 +27,6 @@ class AStar(SearchAlgorithm):
         
         heapq.heappush(frontier, (h_func(initial_state), tie_breaker, 0, initial_state, []))
         best_costs = {initial_state: 0}
-class AStar(SearchAlgorithm):
-    def __init__(self, heuristic_name="manhattan", max_nodes=500000):
-        self.max_nodes = max_nodes
-        self.heuristic_name = heuristic_name
-
-    def search(self, game):
-        initial_state = game.get_initial_state()
-        goals = game.goals
-        
-        if self.heuristic_name == "manhattan":
-            h_func = lambda s: heuristic_manhattan(s, goals)
-        else:
-            h_func = lambda s: 0
-            
-        frontier = []
-        
-        tie_breaker = 0 
-        
-        heapq.heappush(frontier, (h_func(initial_state), tie_breaker, 0, initial_state, []))
-        
-        best_costs = {initial_state: 0}
         
         nodes_expanded = 0
         start_time = time.time()
@@ -66,6 +45,8 @@ class AStar(SearchAlgorithm):
                 elapsed = time.time() - start_time
                 print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | f_cost actual: {f_cost} | Tiempo: {elapsed:.2f}s")
 
+            # Ahora como max_nodes es infinito, esto nunca va a cortar la búsqueda
+            # a menos que le pases un número explícitamente desde main.py
             if nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
                 return None, nodes_expanded, len(frontier)
