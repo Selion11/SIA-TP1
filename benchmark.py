@@ -69,14 +69,14 @@ def run_benchmarks():
             {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
             {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
         ],
-        # "level_7.txt": [
-        #     {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
-        #     {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
-        #     {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
-        #     {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
-        #     {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
-        #     {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
-        # ]
+        "level_7.txt": [
+            {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
+            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ]
     }
 
     os.makedirs("resultados/gifs", exist_ok=True)

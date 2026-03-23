@@ -1,0 +1,43 @@
+Map,Algorithm,Heuristic,Time (s),Expanded Nodes,Frontier Nodes,Steps,Full_Name
+level_1,BFS,Ninguna,0.00031304359436035156,4,1,3,BFS
+level_1,DFS,Ninguna,0.00040411949157714844,3,2,3,DFS
+level_1,A*,manhattan,0.00029158592224121094,4,2,3,A* (manhattan)
+level_1,A*,manhattan_player,0.0008339881896972656,4,2,3,A* (manhattan_player)
+level_1,Greedy,manhattan,0.0005102157592773438,3,2,3,Greedy (manhattan)
+level_1,Greedy,manhattan_player,0.0003323554992675781,3,2,3,Greedy (manhattan_player)
+level_2,BFS,Ninguna,0.00041365623474121094,97,19,11,BFS
+level_2,DFS,Ninguna,0.0010933876037597656,128,21,45,DFS
+level_2,A*,manhattan,0.0008170604705810547,81,15,11,A* (manhattan)
+level_2,A*,manhattan_player,0.0013682842254638672,60,21,11,A* (manhattan_player)
+level_2,Greedy,manhattan,0.0006687641143798828,22,8,11,Greedy (manhattan)
+level_2,Greedy,manhattan_player,0.0010001659393310547,41,23,11,Greedy (manhattan_player)
+level_3,BFS,Ninguna,0.006213665008544922,1845,243,18,BFS
+level_3,DFS,Ninguna,0.012685537338256836,3041,158,236,DFS
+level_3,A*,manhattan,0.009312629699707031,949,250,18,A* (manhattan)
+level_3,A*,manhattan_player,0.005319118499755859,745,283,18,A* (manhattan_player)
+level_3,Greedy,manhattan,0.003240823745727539,336,54,22,Greedy (manhattan)
+level_3,Greedy,manhattan_player,0.006521701812744141,668,368,28,Greedy (manhattan_player)
+level_4,BFS,Ninguna,0.022084712982177734,4886,1111,16,BFS
+level_4,DFS,Ninguna,0.03173971176147461,8142,198,284,DFS
+level_4,A*,manhattan,0.036401987075805664,3016,1046,16,A* (manhattan)
+level_4,A*,manhattan_player,0.024769067764282227,2455,1179,16,A* (manhattan_player)
+level_4,Greedy,manhattan,0.0012352466583251953,41,36,16,Greedy (manhattan)
+level_4,Greedy,manhattan_player,0.0007777214050292969,34,42,16,Greedy (manhattan_player)
+level_5,BFS,Ninguna,1.381960391998291,292280,23292,26,BFS
+level_5,DFS,Ninguna,32.740628719329834,381836,4028,5428,DFS
+level_5,A*,manhattan,0.9148476123809814,75127,34138,26,A* (manhattan)
+level_5,A*,manhattan_player,0.8545544147491455,58884,37462,26,A* (manhattan_player)
+level_5,Greedy,manhattan,0.006952524185180664,456,333,36,Greedy (manhattan)
+level_5,Greedy,manhattan_player,0.007926464080810547,319,460,36,Greedy (manhattan_player)
+level_6,BFS,Ninguna,0.31552648544311523,61155,32559,18,BFS
+level_6,DFS,Ninguna,35.78915214538574,381641,3837,5059,DFS
+level_6,A*,manhattan,0.19660115242004395,11203,8668,18,A* (manhattan)
+level_6,A*,manhattan_player,0.14879679679870605,8476,8527,18,A* (manhattan_player)
+level_6,Greedy,manhattan,0.0037560462951660156,104,80,25,Greedy (manhattan)
+level_6,Greedy,manhattan_player,0.10454773902893066,6643,6647,25,Greedy (manhattan_player)
+level_7,BFS,Ninguna,143.59059834480286,LIMIT,LIMIT,LIMIT,BFS
+level_7,DFS,Ninguna,4226.892796754837,ERROR,ERROR,ERROR,DFS
+level_7,A*,manhattan,394.43990325927734,LIMIT,LIMIT,LIMIT,A* (manhattan)
+level_7,A*,manhattan_player,494.49850249290466,LIMIT,LIMIT,LIMIT,A* (manhattan_player)
+level_7,Greedy,manhattan,0.8194584846496582,31425,8543,174,Greedy (manhattan)
+level_7,Greedy,manhattan_player,0.2992978096008301,17358,11480,174,Greedy (manhattan_player)
