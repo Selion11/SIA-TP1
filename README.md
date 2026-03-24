@@ -96,3 +96,124 @@ docker run --rm -v ${PWD}:/app sokoban-solver
 ```bash
 docker run --rm -v $(pwd):/app sokoban-solver
 ```
+
+
+### 4. Ejecutar en modo 'batch'
+
+Si se desea generar una ejecucion en modo batch es necesario modificar el archivo `benchmark.py`. En la linea 23 del archivo se encontrara el comienzo de un array llamado `runs_plan`. Este array contendra todas las corridas de la siguiente manera:
+
+```bash
+"map_name":{
+   {"algo_name": "Algorithm_name", "algo_obj": Algorithm_function, "heuristic": "heurisitc_name"},
+}
+```
+- **heuristic_name**: Es el nobre de la heuristica mencionada en el paso de configuracion.
+- **algorithm_name**: Es el algoritmo a utilizar BFS,DFS,A* o Greedy.
+- **algorithm_function**: Funcion que utiliza el algoritmo seleccionado. BFS(), DFS(), 
+AStar(heuristic_name="heurisitc_name"), Greedy(heuristic_name="heurisitc_name").
+
+Una vez seteadas las corridas deseadas se debe correr el siguiente comando desde la raiz del proyecto
+
+```bash
+python ./benchmark.py 
+```
+
+### 5. Generar los graficos para estudiar los resultados del benchmark
+
+Esto se puede realizar unicamente despues de generado el benchamrk del punto anterior. Desde la raiz del proyecto se debe correr el siguiente comando
+
+```bash
+python ./plotter.py 
+```
+
+Esto generara los siguientes graficos:
+
+- Comparacion entre a* y greedy con manhattan para cada mapa comparando (un grafico por punto):
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre a* y greedy con manhattan_player para cada mapa (un grafico por punto):
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre bfs y dfs para cada mapa (un grafico por punto):
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre a* con manhattan_player analizando las corridas de todos los mapas comparando (un grafico por punto) para poder comarar la eficiencia de esto segun la complejidad del mapa:
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre a* con manhattan analizando las corridas de todos los mapas comparando (un grafico por punto) para poder comarar la eficiencia de esto segun la complejidad del mapa:
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre greedy con manhattan_player analizando las corridas de todos los mapas comparando (un grafico por punto) para poder comarar la eficiencia de esto segun la complejidad del mapa:
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre greedy con manhattan analizando las corridas de todos los mapas comparando (un grafico por punto) para poder comarar la eficiencia de esto segun la complejidad del mapa:
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre dfs analizando las corridas de todos los mapas comparando (un grafico por punto) para poder comarar la eficiencia de esto segun la complejidad del mapa:
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
+
+- Comparacion entre bfs analizando las corridas de todos los mapas comparando (un grafico por punto) para poder comarar la eficiencia de esto segun la complejidad del mapa:
+
+  1) Tiempo que tarda en llegar a la solucion
+
+  2) Nodos totales expanidos
+
+  3) Nodos frontera
+
+  4) Pasos de la solucion optima
