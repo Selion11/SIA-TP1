@@ -89,8 +89,7 @@ class SokobanGame:
                 new_boxes_list.remove(new_p)
                 new_boxes_list.append(new_box)
                 
-                # ---> CORRECCIÓN CLAVE: Ordenar las cajas <---
-                # Convertimos a tupla ORDENADA para que el estado sea único e inmutable
+
                 new_boxes = tuple(sorted(new_boxes_list))
                 
                 successors.append(((new_p, new_boxes), action))

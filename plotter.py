@@ -52,7 +52,6 @@ def plot_4_metrics(data, x_col, hue_col, title, filename):
             
     plt.tight_layout()
     os.makedirs("resultados/graficos", exist_ok=True)
-    # Usamos bbox_inches='tight' para que al guardar no recorte la leyenda que movimos afuera
     plt.savefig(f"resultados/graficos/{filename}.png", bbox_inches='tight')
     plt.close()
     print(f"  -> Generado: {filename}.png")
@@ -111,7 +110,6 @@ if __name__ == "__main__":
         print("Leyendo y limpiando datos del benchmark...")
         df_resultados = pd.read_csv(csv_path)
         
-        # Limpieza de espacios en blanco
         df_resultados['Algorithm'] = df_resultados['Algorithm'].str.strip()
         df_resultados['Heuristic'] = df_resultados['Heuristic'].str.strip()
         df_resultados['Map'] = df_resultados['Map'].str.strip()

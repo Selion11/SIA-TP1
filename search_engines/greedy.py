@@ -16,7 +16,6 @@ class Greedy(SearchAlgorithm):
         self.max_nodes = max_nodes
 
         
-        # Chequeo por si el mapa ya arranca ganado
         if game.is_goal(initial_state):
             return [], 0, 0
         
@@ -32,7 +31,6 @@ class Greedy(SearchAlgorithm):
         tie_breaker = count()
         initial_h = h_func(initial_state)
 
-        # Iniciamos la frontera con el estado inicial
         frontier = []
         heapq.heappush(frontier, (initial_h, next(tie_breaker), initial_state, []))
         
@@ -58,9 +56,9 @@ class Greedy(SearchAlgorithm):
                     print(f"   [VIVO] {nodes_expanded/1000000:.1f}M nodos... | Tiempo: {int(elapsed)}s | Frontera: {len(frontier)}")
                     last_log_time = current_time
 
-            # if nodes_expanded % 1000 == 0:
-            #     elapsed = time.time() - start_time
-            #     print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
+            if nodes_expanded % 1000 == 0:
+                elapsed = time.time() - start_time
+                print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
 
             if self.max_nodes is not None and nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
@@ -70,8 +68,7 @@ class Greedy(SearchAlgorithm):
                 if next_state not in visited:
                     new_path = path + [action]
                     
-                    # EARLY GOAL TEST: Frenamos de inmediato al tocar la meta.
-                    # Como Greedy no es óptimo, no perdemos nada y ganamos velocidad.
+
                     if game.is_goal(next_state):
                         print(f"--- ¡Solución encontrada! ---")
                         return new_path, nodes_expanded, len(frontier)

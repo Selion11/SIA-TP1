@@ -10,7 +10,6 @@ class DFS(SearchAlgorithm):
         self.max_nodes = max_nodes
 
         
-        # Chequeo por si el mapa ya arranca ganado
         if game.is_goal(initial_state):
             return [], 0, 0
             
@@ -37,9 +36,9 @@ class DFS(SearchAlgorithm):
                     print(f"   [VIVO] {nodes_expanded/1000000:.1f}M nodos... | Tiempo: {int(elapsed)}s | Frontera: {len(frontier)}")
                     last_log_time = current_time
 
-            # if nodes_expanded % 1000 == 0:
-            #     elapsed = time.time() - start_time
-            #     print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
+            if nodes_expanded % 1000 == 0:
+                elapsed = time.time() - start_time
+                print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
 
             if self.max_nodes is not None and nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
@@ -49,7 +48,6 @@ class DFS(SearchAlgorithm):
                 if next_state not in visited:
                     new_path = path + [action]
                     
-                    # EARLY GOAL TEST: Frenamos ni bien generamos la solución
                     if game.is_goal(next_state):
                         print(f"--- ¡Solución encontrada! ---")
                         return new_path, nodes_expanded, len(frontier)
