@@ -17,7 +17,7 @@ def load_map(filename):
         return [list(line.rstrip('\n')) for line in f.readlines()]
 
 def run_benchmarks():
-    MAX_NODES = 12000000  # Límite de 12 Millones de nodos
+    MAX_NODES = None
     CSV_PATH = "resultados/metricas_completas.csv"
     
     runs_plan = {
@@ -71,10 +71,12 @@ def run_benchmarks():
         ],
         "level_7.txt": [
             {"algo_name": "BFS", "algo_obj": BFS(), "heuristic": "Ninguna"},
-            {"algo_name": "DFS", "algo_obj": DFS(), "heuristic": "Ninguna"},
             {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan"), "heuristic": "manhattan"},
             {"algo_name": "A*", "algo_obj": AStar(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"},
             {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan"), "heuristic": "manhattan"},
+            {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
+        ],
+        "level_8.txt": [
             {"algo_name": "Greedy", "algo_obj": Greedy(heuristic_name="manhattan_player"), "heuristic": "manhattan_player"}
         ]
     }
@@ -95,7 +97,10 @@ def run_benchmarks():
             print(f"--- [AVISO] El CSV existe pero hubo un error al leerlo: {e}. Empezando de cero. ---")
 
     print("==================================================")
-    print(f" INICIANDO BENCHMARK (Límite: {MAX_NODES} nodos) ")
+    if MAX_NODES is not None:
+        print(f" INICIANDO BENCHMARK (Límite: {MAX_NODES} nodos) ")
+    else:
+        print(" INICIANDO BENCHMARK (Sin límite de nodos) ")
     print("==================================================")
 
     for map_file, runs in runs_plan.items():

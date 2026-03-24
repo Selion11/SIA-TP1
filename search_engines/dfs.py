@@ -2,11 +2,10 @@ import time
 from .search_algorithm import SearchAlgorithm
 
 class DFS(SearchAlgorithm):
-    # Límite en infinito para el benchmark
-    def __init__(self, max_nodes=12000000):
+    def __init__(self, max_nodes=None):
         self.max_nodes = max_nodes
 
-    def search(self, game,max_nodes=12000000):
+    def search(self, game, max_nodes=None):
         initial_state = game.get_initial_state()
         self.max_nodes = max_nodes
 
@@ -42,7 +41,7 @@ class DFS(SearchAlgorithm):
             #     elapsed = time.time() - start_time
             #     print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | Tiempo: {elapsed:.2f}s")
 
-            if nodes_expanded > self.max_nodes:
+            if self.max_nodes is not None and nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
                 return None, "LIMIT", "LIMIT"
 

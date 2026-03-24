@@ -4,12 +4,11 @@ from .search_algorithm import SearchAlgorithm
 from .heuristics import heuristic_manhattan, heuristic_manhattan_player
 
 class AStar(SearchAlgorithm):
-    # Cambiamos a infinito (float('inf')) para que no se corte en el benchmark
-    def __init__(self, heuristic_name="manhattan", max_nodes=12000000):
+    def __init__(self, heuristic_name="manhattan", max_nodes=None):
         self.max_nodes = max_nodes
         self.heuristic_name = heuristic_name
 
-    def search(self, game,max_nodes=12000000):
+    def search(self, game, max_nodes=None):
         initial_state = game.get_initial_state()
         goals = game.goals
         self.max_nodes = max_nodes
@@ -53,9 +52,7 @@ class AStar(SearchAlgorithm):
             #     elapsed = time.time() - start_time
             #     print(f"[LOG] Nodos expandidos: {nodes_expanded} | Frontera: {len(frontier)} | f_cost actual: {f_cost} | Tiempo: {elapsed:.2f}s")
 
-            # Ahora como max_nodes es infinito, esto nunca va a cortar la búsqueda
-            # a menos que le pases un número explícitamente desde main.py
-            if nodes_expanded > self.max_nodes:
+            if self.max_nodes is not None and nodes_expanded > self.max_nodes:
                 print(f"--- Límite de nodos alcanzado ({self.max_nodes}) ---")
                 return None, "LIMIT", "LIMIT"
 
