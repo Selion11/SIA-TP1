@@ -22,7 +22,7 @@ output_filename: "sokoban_map3.gif"
   - `manhattan`: Calcula la distancia Manhattan pura desde cada caja hasta su objetivo más cercano.
   - `manhattan_player`: Combina la distancia Manhattan de las cajas con la distancia del jugador a la caja más cercana.
 
-> **💡 PUNTO DE ENTRADA DUAL:** El proyecto cuenta con dos puntos de entrada. `main.py` intenta ejecutar la visualización si se encuentra habilitada, lo cual es ideal para ejecuciones **LOCALES**. En cambio, `main_docker.py` fuerza la desactivación de la visualización (ignorando el archivo de configuración) para evitar crasheos en entornos sin interfaz gráfica nativa como **DOCKER** (es llamado automáticamente por el archivo `Dockerfile`).
+> **PUNTO DE ENTRADA DUAL:** El proyecto cuenta con dos puntos de entrada. `main.py` intenta ejecutar la visualización si se encuentra habilitada, lo cual es ideal para ejecuciones **LOCALES**. En cambio, `main_docker.py` fuerza la desactivación de la visualización (ignorando el archivo de configuración) para evitar crasheos en entornos sin interfaz gráfica nativa como **DOCKER** (es llamado automáticamente por el archivo `Dockerfile`).
 
 ---
 
@@ -120,7 +120,7 @@ python ./benchmark.py
 
 ### 5. Generar los graficos para estudiar los resultados del benchmark
 
-Esto se puede realizar unicamente despues de generado el benchamrk del punto anterior. Desde la raiz del proyecto se debe correr el siguiente comando
+Esto se puede realizar unicamente despues de generado el benchmark del punto anterior. Desde la raiz del proyecto se debe correr el siguiente comando
 
 ```bash
 python ./plotter.py 
